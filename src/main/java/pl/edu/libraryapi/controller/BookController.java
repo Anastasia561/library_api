@@ -10,6 +10,7 @@ import pl.edu.libraryapi.dto.BookUploadRequestDto;
 import pl.edu.libraryapi.dto.BookUserResponseDto;
 import pl.edu.libraryapi.service.BookService;
 import pl.edu.libraryapi.service.FileService;
+import pl.edu.libraryapi.service.StorageService;
 import pl.edu.libraryapi.validator.BookUploadValidator;
 
 import java.util.List;
@@ -20,11 +21,14 @@ public class BookController {
     private final BookService bookService;
     private final FileService fileService;
     private final BookUploadValidator bookUploadValidator;
+    private final StorageService storageService;
 
-    public BookController(BookService bookService, FileService fileService, BookUploadValidator bookUploadValidator) {
+    public BookController(BookService bookService, FileService fileService,
+                          BookUploadValidator bookUploadValidator, StorageService storageService) {
         this.bookService = bookService;
         this.fileService = fileService;
         this.bookUploadValidator = bookUploadValidator;
+        this.storageService = storageService;
     }
 
     @GetMapping
@@ -57,15 +61,30 @@ public class BookController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadBook(@RequestPart("file") List<MultipartFile> files,
                                              @RequestPart("metadata") BookUploadRequestDto dto) {
-        bookUploadValidator.validate(dto);
-        fileService.validateFiles(files);
-        bookService.saveBook(dto);
-        return ResponseEntity.ok().build();
+        try {
+
+            bookUploadValidator.validate(dto);
+            fileService.validateFiles(files);
+            storageService.uploadFiles(files, dto.getIsbn());
+            bookService.saveBook(dto);
+            return ResponseEntity.ok().build();
+
+        } catch (Exception e) {
+
+            storageService.deleteFolder(dto.getIsbn());
+            throw new RuntimeException("Book upload failed", e);
+        }
     }
 
     @DeleteMapping("/{isbn}")
     public ResponseEntity<String> deleteBook(@PathVariable String isbn) {
-        bookService.deleteBookByIsbn(isbn);
-        return ResponseEntity.noContent().build();
+        try {
+            bookService.deleteBookByIsbn(isbn);
+            storageService.deleteFolder(isbn);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            throw new RuntimeException("Book delete failed", e);
+        }
+
     }
 }

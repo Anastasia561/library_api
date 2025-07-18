@@ -2,8 +2,13 @@ spring:
   application:
     name: library-api
 
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 55MB
+
   config:
-    import: optional:classpath:db_credentials.properties
+    import: optional:classpath:credentials.properties
 
   datasource:
     url: ${DB_URL}

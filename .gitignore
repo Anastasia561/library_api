@@ -32,4 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 
-src/main/resources/db_credentials.properties
+src/main/resources/credentials.properties

@@ -1,5 +1,6 @@
 package pl.edu.libraryapi.service;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import pl.edu.libraryapi.dto.BookLibrarianResponseDto;
 import pl.edu.libraryapi.dto.BookUploadRequestDto;
@@ -38,6 +39,7 @@ public class BookService {
                 .map(bookMapper::toBookLibrarianResponseDto).collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteBookByIsbn(String isbn) {
         bookRepository.findByIsbn(isbn)
                 .ifPresentOrElse(bookRepository::delete, () -> {
@@ -45,14 +47,8 @@ public class BookService {
                 });
     }
 
+    @Transactional
     public void saveBook(BookUploadRequestDto dto) {
         bookRepository.save(bookMapper.toBook(dto));
-    }
-
-    public void updateStatus(Status newStatus, String isbn) {
-        Book book = bookRepository.findByIsbn(isbn)
-                .orElseThrow(() -> new EntityNotFoundException("Book with isbn - " + isbn + " not found"));
-        book.setStatus(newStatus);
-        bookRepository.save(book);
     }
 }
