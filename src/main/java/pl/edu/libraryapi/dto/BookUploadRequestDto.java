@@ -2,15 +2,26 @@ package pl.edu.libraryapi.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.ISBN;
+import org.springframework.web.multipart.MultipartFile;
+import pl.edu.libraryapi.validation.annotation.Image;
+import pl.edu.libraryapi.validation.annotation.PDF;
+import pl.edu.libraryapi.validation.annotation.UniqueIsbn;
 
 public class BookUploadRequestDto {
+    @Image
+    MultipartFile coverImage;
+    @PDF
+    MultipartFile book;
+    @ISBN
+    @UniqueIsbn
     @NotBlank(message = "ISBN is required")
-    @Size(min = 13, max = 13, message = "ISBN must be exactly 13 characters")
     private String isbn;
     @NotBlank(message = "Title is required")
     private String title;
     @Min(1400)
+    @NotNull(message = "Publication year is required")
     private Integer publicationYear;
     @Min(0)
     private Integer pages;
@@ -22,6 +33,30 @@ public class BookUploadRequestDto {
     private String genre;
 
     public BookUploadRequestDto() {
+    }
+
+    public MultipartFile getCoverImage() {
+        return coverImage;
+    }
+
+    public void setCoverImage(MultipartFile coverImage) {
+        this.coverImage = coverImage;
+    }
+
+    public MultipartFile getBook() {
+        return book;
+    }
+
+    public void setBook(MultipartFile book) {
+        this.book = book;
+    }
+
+    public void setPublicationYear(Integer publicationYear) {
+        this.publicationYear = publicationYear;
+    }
+
+    public Integer getPublicationYear() {
+        return publicationYear;
     }
 
     public String getIsbn() {
@@ -38,14 +73,6 @@ public class BookUploadRequestDto {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public int getPublicationYear() {
-        return publicationYear;
-    }
-
-    public void setPublicationYear(int publicationYear) {
-        this.publicationYear = publicationYear;
     }
 
     public Integer getPages() {

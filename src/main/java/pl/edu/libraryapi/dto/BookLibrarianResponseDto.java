@@ -1,18 +1,25 @@
 package pl.edu.libraryapi.dto;
 
-
-import pl.edu.libraryapi.entity.Status;
+import java.net.URL;
 
 public class BookLibrarianResponseDto {
     private String isbn;
     private String title;
-    private Status status;
     private int publicationYear;
     private String pages;
     private String author;
     private String authorPenName;
     private String publisher;
     private String genre;
+    private URL coverImage;
+
+    public URL getCoverImage() {
+        return coverImage;
+    }
+
+    public void setCoverImage(URL coverImage) {
+        this.coverImage = coverImage;
+    }
 
     public String getIsbn() {
         return isbn;
@@ -28,14 +35,6 @@ public class BookLibrarianResponseDto {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     public int getPublicationYear() {

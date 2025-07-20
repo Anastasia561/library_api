@@ -9,13 +9,11 @@ public class Book {
     private Long id;
     @Column(nullable = false)
     private String title;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String isbn;
     @Column(name = "year", nullable = false)
     private int publicationYear;
     private Integer pages;
-    @Enumerated(EnumType.STRING)
-    private Status status;
     @ManyToOne
     @JoinColumn(name = "author_id")
     private Author author;
@@ -64,14 +62,6 @@ public class Book {
 
     public void setPages(Integer pages) {
         this.pages = pages;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     public Author getAuthor() {

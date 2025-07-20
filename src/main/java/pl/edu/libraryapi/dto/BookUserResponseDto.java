@@ -1,5 +1,7 @@
 package pl.edu.libraryapi.dto;
 
+import java.net.URL;
+
 public class BookUserResponseDto {
     private String isbn;
     private String title;
@@ -9,6 +11,15 @@ public class BookUserResponseDto {
     private String authorPenName;
     private String publisher;
     private String genre;
+    private URL coverImage;
+
+    public URL getCoverImage() {
+        return coverImage;
+    }
+
+    public void setCoverImage(URL coverImage) {
+        this.coverImage = coverImage;
+    }
 
     public String getAuthorPenName() {
         return authorPenName;

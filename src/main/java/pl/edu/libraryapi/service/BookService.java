@@ -6,7 +6,6 @@ import pl.edu.libraryapi.dto.BookLibrarianResponseDto;
 import pl.edu.libraryapi.dto.BookUploadRequestDto;
 import pl.edu.libraryapi.dto.BookUserResponseDto;
 import pl.edu.libraryapi.entity.Book;
-import pl.edu.libraryapi.entity.Status;
 import pl.edu.libraryapi.exception.EntityNotFoundException;
 import pl.edu.libraryapi.mapper.BookMapper;
 import pl.edu.libraryapi.repository.BookRepository;
@@ -37,6 +36,12 @@ public class BookService {
     public List<BookLibrarianResponseDto> getAllBooksForLibrarian() {
         return bookRepository.findAll().stream()
                 .map(bookMapper::toBookLibrarianResponseDto).collect(Collectors.toList());
+    }
+
+    public String getBookTitleByIsbn(String isbn) {
+        return bookRepository.findByIsbn(isbn)
+                .map(Book::getTitle)
+                .orElseThrow(() -> new EntityNotFoundException("Book with isbn - " + isbn + " not found"));
     }
 
     @Transactional

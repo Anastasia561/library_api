@@ -38,7 +38,6 @@ public class BookMapper {
 
     public BookLibrarianResponseDto toBookLibrarianResponseDto(Book book) {
         BookLibrarianResponseDto dto = new BookLibrarianResponseDto();
-        dto.setStatus(book.getStatus());
         dto.setTitle(book.getTitle());
         dto.setPublicationYear(book.getPublicationYear());
         dto.setPages(book.getPages() != null ? book.getPages() + "" : "-");
@@ -56,7 +55,6 @@ public class BookMapper {
         book.setPublicationYear(dto.getPublicationYear());
         book.setPages(dto.getPages());
         book.setIsbn(dto.getIsbn());
-        book.setStatus(Status.UPLOADING);
         Author author = authorRepository.findByFullName(dto.getAuthor().split(" ")[0], dto.getAuthor().split(" ")[1])
                 .orElseThrow(() -> new EntityNotFoundException("Author not found"));
         Publisher publisher = publisherRepository.findByName(dto.getPublisher())
