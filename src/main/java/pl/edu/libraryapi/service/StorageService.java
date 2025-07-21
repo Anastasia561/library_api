@@ -47,20 +47,6 @@ public class StorageService {
         }
     }
 
-    private static String assignFileName(String folderName, MultipartFile file) {
-        String contentType = file.getContentType();
-        String key;
-
-        if (contentType != null && contentType.startsWith("image/")) {
-            key = folderName + "/cover";
-        } else if ("application/pdf".equals(contentType)) {
-            key = folderName + "/book.pdf";
-        } else {
-            throw new IllegalArgumentException("Unsupported file type: " + contentType);
-        }
-        return key;
-    }
-
     public void deleteFolder(String folderName) {
         ListObjectsV2Request listRequest = ListObjectsV2Request.builder()
                 .bucket(bucketName)
@@ -113,6 +99,35 @@ public class StorageService {
                 .build();
 
         return s3Presigner.presignGetObject(presignRequest).url();
+    }
+
+    public URL generateBookURL(String folderName, boolean isFull) {
+        String keySuffix = isFull ? "/book.pdf" : "/preview.pdf";
+        GetObjectRequest request = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(folderName + keySuffix)
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .getObjectRequest(request)
+                .signatureDuration(Duration.ofMinutes(5))
+                .build();
+
+        return s3Presigner.presignGetObject(presignRequest).url();
+    }
+
+    private static String assignFileName(String folderName, MultipartFile file) {
+        String contentType = file.getContentType();
+        String key;
+
+        if (contentType != null && contentType.startsWith("image/")) {
+            key = folderName + "/cover";
+        } else if ("application/pdf".equals(contentType)) {
+            key = folderName + "/book.pdf";
+        } else {
+            throw new IllegalArgumentException("Unsupported file type: " + contentType);
+        }
+        return key;
     }
 
     private String sanitize(String title) {

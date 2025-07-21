@@ -1,5 +1,6 @@
 package pl.edu.libraryapi.controller;
 
+import com.github.fge.jsonpatch.mergepatch.JsonMergePatch;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,68 +18,52 @@ import java.util.List;
 @RequestMapping("/api/books")
 public class BookController {
     private final BookService bookService;
-    private final StorageService storageService;
 
     public BookController(BookService bookService, StorageService storageService) {
         this.bookService = bookService;
-        this.storageService = storageService;
     }
 
     @GetMapping
     public List<BookUserResponseDto> getBooks() {
-        return bookService.getAllBooksForUser().stream()
-                .peek(b -> b.setCoverImage(storageService.generateBookCoverURL(b.getIsbn())))
-                .toList();
+        return bookService.getAllBooksForUser().stream().toList();
     }
 
     @GetMapping("/{isbn}")
     public BookUserResponseDto getBookByIsbn(@PathVariable String isbn) {
-        BookUserResponseDto book = bookService.getBookByIsbn(isbn);
-        book.setCoverImage(storageService.generateBookCoverURL(book.getIsbn()));
-        return book;
+        return bookService.getBookByIsbn(isbn);
     }
 
     @GetMapping("/{isbn}/download/full")
     public URL getFullDownloadUrl(@PathVariable String isbn) {
-        return storageService.generateBookDownloadURL(isbn, bookService.getBookTitleByIsbn(isbn), true);
+        return bookService.getBookDownloadUrl(isbn, true);
     }
 
     @GetMapping("/{isbn}/download/preview")
     public URL getPreviewDownloadUrl(@PathVariable String isbn) {
-        return storageService.generateBookDownloadURL(isbn, bookService.getBookTitleByIsbn(isbn), false);
+        return bookService.getBookDownloadUrl(isbn, false);
     }
 
     @GetMapping("/info")
     public List<BookLibrarianResponseDto> getBooksInfo() {
-
-        return bookService.getAllBooksForLibrarian().stream()
-                .peek(b -> b.setCoverImage(storageService.generateBookCoverURL(b.getIsbn())))
-                .toList();
+        return bookService.getAllBooksForLibrarian().stream().toList();
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadBook(@ModelAttribute @Valid BookUploadRequestDto dto) {
-        try {
-            storageService.uploadFiles(List.of(dto.getBook(), dto.getCoverImage()), dto.getIsbn());
-            bookService.saveBook(dto);
-            return ResponseEntity.ok().build();
-
-        } catch (Exception e) {
-
-            storageService.deleteFolder(dto.getIsbn());
-            throw new RuntimeException("Book upload failed", e);
-        }
+        bookService.saveBook(dto);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{isbn}")
     public ResponseEntity<String> deleteBook(@PathVariable String isbn) {
-        try {
-            bookService.deleteBookByIsbn(isbn);
-            storageService.deleteFolder(isbn);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            throw new RuntimeException("Book delete failed", e);
-        }
+        bookService.deleteBookByIsbn(isbn);
+        return ResponseEntity.noContent().build();
+    }
 
+    @PatchMapping(path = "/{isbn}/update")
+    public ResponseEntity<BookLibrarianResponseDto> mergePatchBook(@PathVariable String isbn,
+                                                                   @RequestBody JsonMergePatch patch) {
+        BookLibrarianResponseDto patchedBook = bookService.applyMergePatchToBook(isbn, patch);
+        return ResponseEntity.ok(patchedBook);
     }
 }

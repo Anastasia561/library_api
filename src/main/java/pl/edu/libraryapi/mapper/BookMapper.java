@@ -2,6 +2,7 @@ package pl.edu.libraryapi.mapper;
 
 import org.springframework.stereotype.Component;
 import pl.edu.libraryapi.dto.BookLibrarianResponseDto;
+import pl.edu.libraryapi.dto.BookUpdateDto;
 import pl.edu.libraryapi.dto.BookUploadRequestDto;
 import pl.edu.libraryapi.dto.BookUserResponseDto;
 import pl.edu.libraryapi.entity.*;
@@ -40,7 +41,7 @@ public class BookMapper {
         BookLibrarianResponseDto dto = new BookLibrarianResponseDto();
         dto.setTitle(book.getTitle());
         dto.setPublicationYear(book.getPublicationYear());
-        dto.setPages(book.getPages() != null ? book.getPages() + "" : "-");
+        dto.setPages(book.getPages() != null ? book.getPages() : 0);
         dto.setAuthor(book.getAuthor().getFirstName() + " " + book.getAuthor().getLastName());
         dto.setPublisher(book.getPublisher().getName());
         dto.setGenre(book.getGenre().getName());
@@ -65,5 +66,31 @@ public class BookMapper {
         book.setPublisher(publisher);
         book.setGenre(genre);
         return book;
+    }
+
+    public void updateBook(Book book, BookUpdateDto dto) {
+        book.setTitle(dto.getTitle());
+        book.setPublicationYear(dto.getPublicationYear());
+        book.setPages(dto.getPages());
+        Author author = authorRepository.findByFullName(dto.getAuthor().split(" ")[0], dto.getAuthor().split(" ")[1])
+                .orElseThrow(() -> new EntityNotFoundException("Author not found"));
+        Publisher publisher = publisherRepository.findByName(dto.getPublisher())
+                .orElseThrow(() -> new EntityNotFoundException("Publisher not found"));
+        Genre genre = genreRepository.findByName(dto.getGenre())
+                .orElseThrow(() -> new EntityNotFoundException("Genre not found"));
+        book.setAuthor(author);
+        book.setPublisher(publisher);
+        book.setGenre(genre);
+    }
+
+    public BookUpdateDto toBookUpdateDto(Book book) {
+        BookUpdateDto dto = new BookUpdateDto();
+        dto.setTitle(book.getTitle());
+        dto.setPublicationYear(book.getPublicationYear());
+        dto.setPages(book.getPages());
+        dto.setAuthor(book.getAuthor().getFirstName() + " " + book.getAuthor().getLastName());
+        dto.setGenre(book.getGenre().getName());
+        dto.setPublisher(book.getPublisher().getName());
+        return dto;
     }
 }

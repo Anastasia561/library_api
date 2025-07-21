@@ -1,51 +1,16 @@
 package pl.edu.libraryapi.dto;
 
-import java.net.URL;
+import jakarta.validation.constraints.Min;
 
-public class BookLibrarianResponseDto {
-    private String isbn;
+public class BookUpdateDto {
     private String title;
+    @Min(1400)
     private int publicationYear;
+    @Min(0)
     private Integer pages;
     private String author;
-    private String authorPenName;
     private String publisher;
     private String genre;
-    private URL coverImage;
-    private URL fullBookDocument;
-    private URL previewBookDocument;
-
-    public URL getFullBookDocument() {
-        return fullBookDocument;
-    }
-
-    public void setFullBookDocument(URL fullBookDocument) {
-        this.fullBookDocument = fullBookDocument;
-    }
-
-    public URL getPreviewBookDocument() {
-        return previewBookDocument;
-    }
-
-    public void setPreviewBookDocument(URL previewBookDocument) {
-        this.previewBookDocument = previewBookDocument;
-    }
-
-    public URL getCoverImage() {
-        return coverImage;
-    }
-
-    public void setCoverImage(URL coverImage) {
-        this.coverImage = coverImage;
-    }
-
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
-    }
 
     public String getTitle() {
         return title;
@@ -77,14 +42,6 @@ public class BookLibrarianResponseDto {
 
     public void setAuthor(String author) {
         this.author = author;
-    }
-
-    public String getAuthorPenName() {
-        return authorPenName;
-    }
-
-    public void setAuthorPenName(String authorPenName) {
-        this.authorPenName = authorPenName;
     }
 
     public String getPublisher() {

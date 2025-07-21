@@ -8,10 +8,9 @@ spring:
       max-request-size: 55MB
 
   config:
-    import: optional:classpath:credentials.properties
+    import: optional:file:.env[.properties]
 
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-
